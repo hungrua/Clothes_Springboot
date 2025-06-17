@@ -14,7 +14,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/sizes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "https://clothes-fe-seven.vercel.app/")
+@CrossOrigin(origins = {
+        "https://clothes-fe-seven.vercel.app",
+        "http://localhost:5173"
+})
 public class SizeController {
 
     private final SizeService sizeService;
