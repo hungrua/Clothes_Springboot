@@ -49,7 +49,10 @@ public class ColorService implements IColorService {
     @Override
     public ColorResponse findColorById(Integer id) {
         Color color = colorRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.error("Không tìm thấy màu có id {} trong hệ thống", id);
+                    return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+                });
         return colorMapper.toColorResponse(color);
     }
 
@@ -82,7 +85,10 @@ public class ColorService implements IColorService {
      */
     @Override
     public ColorResponse updateColor(Integer id, ColorRequest request) {
-        Color color = colorRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+        Color color = colorRepository.findById(id).orElseThrow(() -> {
+            log.error("Không tìm thấy màu có id {} trong hệ thống để cập nhật", id);
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        });
         colorMapper.updateColor(color, request);
         color.setUpdatedAt(new Date());
         color = colorRepository.save(color);
@@ -95,7 +101,10 @@ public class ColorService implements IColorService {
      */
     @Override
     public void deleteColor(Integer id) {
-        Color color = colorRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+        Color color = colorRepository.findById(id).orElseThrow(() -> {
+            log.error("Không tìm thấy màu có id {} trong hệ thống để xóa", id);
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        });
         color.setDeleted(true);
         colorRepository.save(color);
         log.info("Xóa màu với mã {} thành công", color.getColorCode());

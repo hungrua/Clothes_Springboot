@@ -59,7 +59,10 @@ public class ClothesVariantsService implements IClothesVariantsService {
     @Override
     public ClothesVariantsResponse findClothesVariantsById(Integer id) {
         ClothesVariants clothesVariants = clothesVariantsRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.error("Không tìm thấy biến thể có id {} trong hệ thống", id);
+                    return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+                });
         return clothesVariantsMapper.toClothesVariantsResponse(clothesVariants);
     }
 
@@ -72,19 +75,30 @@ public class ClothesVariantsService implements IClothesVariantsService {
     @Override
     public ClothesVariantsResponse createClothesVariants(ClothesVariantsRequest request) {
         ClothesVariants clothesVariants = clothesVariantsMapper.toClothesVariants(request);
-        Clothes clothes = clothesRepository.findById(request.getClothes_id()).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+        Clothes clothes = clothesRepository.findById(request.getClothes_id()).orElseThrow(() -> {
+            log.error("Không tìm thấy loại quần áo có id {} trong hệ thống", request.getClothes_id());
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        });
         clothesVariants.setClothes(clothes);
         log.debug("Quần áo lấy từ DB khi tạo biến thể quần áo có mã là {} ", clothes.getClothesCode());
-        clothesVariants.setColor(colorRepository.findById(request.getColor_id()).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND)));
-        clothesVariants.setSize(sizeRepository.findById(request.getSize_id()).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND)));
+        clothesVariants.setColor(colorRepository.findById(request.getColor_id()).orElseThrow(() -> {
+            log.error("Không tìm thấy màu có id {} trong hệ thống", request.getColor_id());
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        }));
+        clothesVariants.setSize(sizeRepository.findById(request.getSize_id()).orElseThrow(() -> {
+            log.error("Không tìm thấy kích cỡ có id {} trong hệ thống", request.getSize_id());
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        }));
         clothesVariants.setDeleted(false);
         clothesVariants.setCreatedAt(new Date());
         ClothesVariants newClothesVariants = clothesVariantsRepository.save(clothesVariants);
+        log.debug("Biến thể được tạo ra {}", newClothesVariants);
+        log.info("Tạo biến thể thành công với id {}", newClothesVariants.getId());
         return clothesVariantsMapper.toClothesVariantsResponse(newClothesVariants);
     }
 
     /**
-     * Create new clothesVariants
+     * Update clothesVariants
      *
      * @param id      -- id of clothesVariants is updated
      * @param request -- clothesVariants information needed to update
@@ -92,23 +106,34 @@ public class ClothesVariantsService implements IClothesVariantsService {
      */
     @Override
     public ClothesVariantsResponse updateClothesVariants(Integer id, ClothesVariantsRequest request) {
-        ClothesVariants clothesVariants = clothesVariantsRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+        ClothesVariants clothesVariants = clothesVariantsRepository.findById(id).orElseThrow(() -> {
+            log.error("Không tìm thấy biến thể có id {} trong hệ thống để cập nhật", id);
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        });
         clothesVariantsMapper.updateClothesVariants(clothesVariants, request);
         clothesVariants.setClothes(clothesRepository.findById(request.getClothes_id()).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND)));
         clothesVariants.setColor(colorRepository.findById(request.getColor_id()).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND)));
         clothesVariants.setSize(sizeRepository.findById(request.getSize_id()).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND)));
         clothesVariants.setUpdatedAt(new Date());
         clothesVariants = clothesVariantsRepository.save(clothesVariants);
+        log.debug("Biến thể được cập nhật {}", clothesVariants);
+        log.info("Cập nhật biến thể với id {} thành công", clothesVariants.getId());
         return clothesVariantsMapper.toClothesVariantsResponse(clothesVariants);
     }
 
     /**
+     * Delete clothesVariants
+     *
      * @param id -- id of clothesVariants needed to be deleted
      */
     @Override
     public void deleteClothesVariants(Integer id) {
-        ClothesVariants clothesVariants = clothesVariantsRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+        ClothesVariants clothesVariants = clothesVariantsRepository.findById(id).orElseThrow(() -> {
+            log.error("Không tìm thấy biến thể có id {} trong hệ thống để xóa", id);
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        });
         clothesVariants.setDeleted(true);
         clothesVariantsRepository.save(clothesVariants);
+        log.info("Xóa biến thể thành công");
     }
 }

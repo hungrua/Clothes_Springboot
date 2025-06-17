@@ -28,7 +28,11 @@ public class TypeDetailsService implements ITypeDetailsService {
     @Autowired
     private TypeDetailsMapper typeDetailsMapper;
 
-
+    /**
+     * Get list of all type details that are not deleted
+     *
+     * @return list of all type details that are not deleted
+     */
     @Override
     public List<TypeDetailsResponse> getAllTypeDetails() {
         List<TypeDetails> typeDetailsList = typeDetailsRepository.findByIsDeletedFalse();
@@ -37,12 +41,24 @@ public class TypeDetailsService implements ITypeDetailsService {
                 .toList();
     }
 
+    /**
+     * Get the type details by its id
+     *
+     * @param id -- type details id
+     * @return type details have the id
+     */
     @Override
     public TypeDetailsResponse findTypeDetailsById(Integer id) {
         TypeDetails typeDetails = typeDetailsRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
         return typeDetailsMapper.toTypeDetailsResponse(typeDetails);
     }
 
+    /**
+     * Create new type details
+     *
+     * @param request -- create information
+     * @return a new type details have been created
+     */
     @Override
     public TypeDetailsResponse createTypeDetails(TypeDetailsRequest request) {
         TypeDetails typeDetails = typeDetailsMapper.toTypeDetails(request);
@@ -51,7 +67,7 @@ public class TypeDetailsService implements ITypeDetailsService {
             throw new AppException(ErrorCode.DUPLICATE_FIELD_CODE);
         }
         ClothesType clothesType = clothesTypeRepository.findById(request.getType_id()).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
-        log.debug("Thể loại lấy từ DB khi tạo loại quần áo có mã là {} ", clothesType.getCode());
+        log.debug("Tạo mới: Thể loại lấy từ DB khi tạo loại quần áo có mã là {} ", clothesType.getCode());
         typeDetails.setClothesType(clothesType);
         typeDetails.setDeleted(false);
         typeDetails.setCreatedAt(new Date());
@@ -60,12 +76,19 @@ public class TypeDetailsService implements ITypeDetailsService {
         return typeDetailsMapper.toTypeDetailsResponse(newTypeDetails);
     }
 
+    /**
+     * Update type details
+     *
+     * @param id      -- id of type details
+     * @param request -- update information
+     * @return updated type details
+     */
     @Override
     public TypeDetailsResponse updateTypeDetails(Integer id, TypeDetailsRequest request) {
         TypeDetails typeDetails = typeDetailsRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
         // Attach Clothes Type to Type Details if type_id not null
         ClothesType clothesType = clothesTypeRepository.findById(request.getType_id()).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
-        log.debug("Thể loại lấy từ DB khi tạo loại quần áo có mã là {} ", clothesType.getCode());
+        log.debug("Cập nhật: Thể loại lấy từ DB khi tạo loại quần áo có mã là {} ", clothesType.getCode());
         typeDetails.setClothesType(clothesType);
         // Update Clothes Type
         typeDetailsMapper.updateTypeDetails(typeDetails, request);
@@ -75,6 +98,11 @@ public class TypeDetailsService implements ITypeDetailsService {
         return typeDetailsMapper.toTypeDetailsResponse(typeDetails);
     }
 
+    /**
+     * Delete soft type details
+     *
+     * @param id -- id of type details
+     */
     @Override
     public void deleteTypeDetails(Integer id) {
         TypeDetails typeDetails = typeDetailsRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));

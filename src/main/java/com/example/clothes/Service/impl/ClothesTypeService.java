@@ -49,7 +49,10 @@ public class ClothesTypeService implements IClothesTypeService {
     @Override
     public ClothesTypeResponse findClothesTypeById(Integer id) {
         ClothesType clothesType = clothesTypeRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.error("Không tìm thấy thể loại có id {} trong hệ thống", id);
+                    return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+                });
         return clothesTypeMapper.toClosClothesTypeResponse(clothesType);
     }
 
@@ -69,11 +72,13 @@ public class ClothesTypeService implements IClothesTypeService {
         clothesType.setDeleted(false);
         clothesType.setCreatedAt(new Date());
         ClothesType newClothesType = clothesTypeRepository.save(clothesType);
+        log.debug("Thể loại được tạo ra {}", newClothesType);
+        log.info("Tạo thể loại với id {} thành công", newClothesType.getId());
         return clothesTypeMapper.toClosClothesTypeResponse(newClothesType);
     }
 
     /**
-     * Create new clothes type
+     * Update new clothes type
      *
      * @param id      -- id of clothes type is updated
      * @param request -- clothes type information needed to update
@@ -81,20 +86,31 @@ public class ClothesTypeService implements IClothesTypeService {
      */
     @Override
     public ClothesTypeResponse updateClothesType(Integer id, ClothesTypeRequest request) {
-        ClothesType clothesType = clothesTypeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+        ClothesType clothesType = clothesTypeRepository.findById(id).orElseThrow(() -> {
+            log.error("Không tìm thấy thể loại có id {} trong hệ thống để cập nhật", id);
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        });
         clothesTypeMapper.updateClothesType(clothesType, request);
         clothesType.setUpdatedAt(new Date());
         clothesType = clothesTypeRepository.save(clothesType);
+        log.debug("Thể loại sau khi cập nhật {}", clothesType);
+        log.info("Cập nhật thể loại với id {} thành công", clothesType.getId());
         return clothesTypeMapper.toClosClothesTypeResponse(clothesType);
     }
 
     /**
+     * Delete clothes type
+     *
      * @param id -- id of clothes type needed to be deleted
      */
     @Override
     public void deleteClothesType(Integer id) {
-        ClothesType clothesType = clothesTypeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PARAMETER_NOT_FOUND));
+        ClothesType clothesType = clothesTypeRepository.findById(id).orElseThrow(() -> {
+            log.error("Không thể xóa thể loại này do không tìm thấy id {} trong hệ thống", id);
+            return new AppException(ErrorCode.PARAMETER_NOT_FOUND);
+        });
         clothesType.setDeleted(true);
         clothesTypeRepository.save(clothesType);
+        log.info("Xóa thể loại thành công");
     }
 }
