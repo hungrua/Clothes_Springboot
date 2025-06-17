@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/api/v1/clothes")
 @RequiredArgsConstructor
 @CrossOrigin(origins = {
-        "https://clothes-fe-seven.vercel.app",
+        "https://clothes-fe-ten.vercel.app",
         "http://localhost:5173"
 })
 public class ClothesController {
