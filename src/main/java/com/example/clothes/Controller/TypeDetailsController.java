@@ -13,7 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/type_details")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "https://clothes-fe-seven.vercel.app/")
 public class TypeDetailsController {
 
     private final TypeDetailsService typeDetailsService;
