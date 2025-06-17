@@ -1,6 +1,7 @@
 package com.example.clothes.DTO.RequestDTO;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -15,6 +16,6 @@ public class ClothesRequest {
     @NotBlank(message = "EMPTY_FIELD")
     private String clothesName;
     private String description;
-    @NotBlank(message = "EMPTY_FIELD")
+    @NotEmpty(message = "EMPTY_FIELD")
     private Set<Integer> typeDetails;
 }
